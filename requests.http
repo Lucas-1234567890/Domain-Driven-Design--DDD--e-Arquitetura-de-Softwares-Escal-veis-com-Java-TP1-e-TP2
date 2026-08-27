@@ -1,0 +1,37 @@
+### Processar pagamento aprovado
+POST http://localhost:8081/pagamentos
+Content-Type: application/json
+
+{
+  "pedidoId": 1,
+  "valor": 250.00,
+  "numeroCartao": "4111111111111111"
+}
+
+### Pagamento recusado — valor acima do limite (R$ 10.000,00)
+POST http://localhost:8081/pagamentos
+Content-Type: application/json
+
+{
+  "pedidoId": 2,
+  "valor": 15000.00,
+  "numeroCartao": "4111111111111111"
+}
+
+### Pagamento recusado — cartão bloqueado (termina em 0000)
+POST http://localhost:8081/pagamentos
+Content-Type: application/json
+
+{
+  "pedidoId": 3,
+  "valor": 100.00,
+  "numeroCartao": "4111111111110000"
+}
+
+### Buscar pagamento por id (troque pelo id retornado no POST acima)
+GET http://localhost:8081/pagamentos/COLE_O_ID_AQUI
+
+### Console H2 (abra no navegador, não é uma requisição REST)
+# http://localhost:8081/h2-console
+# JDBC URL: jdbc:h2:mem:payment
+# User: sa / Password: (em branco)
