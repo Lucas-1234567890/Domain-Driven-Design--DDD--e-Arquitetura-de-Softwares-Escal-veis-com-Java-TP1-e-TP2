@@ -6,18 +6,19 @@ Este projeto é o material de apoio da Questão 14 do TP1 (DDD e Arquitetura de 
 
 ## Prints
 
-Salve cada captura em `docs/screenshots/` com o nome exato da tabela abaixo — os links no README já apontam pra lá. Enquanto os arquivos não existirem, o GitHub mostra o ícone de imagem quebrada nesses pontos; é normal até você tirar e adicionar os prints.
+Salve cada captura em `docs/screenshots/` com o nome exato abaixo — as imagens já estão referenciadas no README. Enquanto os arquivos não existirem, o GitHub mostra o ícone de imagem quebrada nesses pontos; é normal até você adicionar os prints.
 
-| # | O que mostra |
-|---|---|
-| [`print1.png`](docs/screenshots/print1.png) | Estrutura de pastas do projeto aberta no VSCode |
-| [`print2.png`](docs/screenshots/print2.png) | `mvn spring-boot:run` com a aplicação no ar |
-| [`print3.png`](docs/screenshots/print3.png) | Pagamento aprovado (201 Created) |
-| [`print4.png`](docs/screenshots/print4.png) | Pagamento recusado — valor acima do limite (422) |
-| [`print5.png`](docs/screenshots/print5.png) | Pagamento recusado — cartão bloqueado (422) |
-| [`print6.png`](docs/screenshots/print6.png) | `mvn test` com os 4 testes do agregado passando |
-| [`print7.png`](docs/screenshots/print7.png) | Console H2 com a tabela `pagamentos` populada |
-| [`print8.png`](docs/screenshots/print8.png) | Repositório publicado no GitHub |
+| # | Preview | O que mostra |
+|---|---|---|
+| 1 | <img src="docs/screenshots/print1.png" width="220"/> | Estrutura de pastas do projeto aberta no VSCode |
+| 2 | <img src="docs/screenshots/print2.png" width="220"/> | `mvn spring-boot:run` com a aplicação no ar |
+| 3 | <img src="docs/screenshots/print3.png" width="220"/> | Pagamento aprovado (201 Created) |
+| 4 | <img src="docs/screenshots/print4.png" width="220"/> | Pagamento recusado — valor acima do limite (422) |
+| 5 | <img src="docs/screenshots/print5.png" width="220"/> | Pagamento recusado — cartão bloqueado (422) |
+| 6 | <img src="docs/screenshots/print6.png" width="220"/> | `mvn test` com os 4 testes do agregado passando |
+| 7 | <img src="docs/screenshots/print7.png" width="220"/> | Console H2 com a tabela `pagamentos` populada |
+| 8 | <img src="docs/screenshots/print8.png" width="220"/> | Repositório publicado no GitHub |
+
 
 ## Tecnologias
 
