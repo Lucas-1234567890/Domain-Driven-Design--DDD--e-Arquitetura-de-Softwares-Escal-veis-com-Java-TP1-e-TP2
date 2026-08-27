@@ -181,3 +181,10 @@ git push -u origin main
 - Publicar `PagamentoConfirmadoEvent` em um broker (RabbitMQ/Kafka) em vez de o monólito chamar via HTTP síncrono, reduzindo acoplamento temporal.
 - Trocar o client-generated `UUID` por um Snowflake ID se a ordenação por tempo de criação importar.
 - Adicionar Testcontainers para rodar os testes de integração da camada de persistência contra um Postgres real, já que H2 em memória diverge de produção em alguns detalhes de SQL.
+
+---
+
+**Instituto Infnet**
+Disciplina: Domain-Driven Design (DDD) e Arquitetura de Softwares Escaláveis com Java
+Professor: Leonardo Silva da Gloria
+Aluno: Lucas Amorim Porciuncula
