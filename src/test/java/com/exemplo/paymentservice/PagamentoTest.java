@@ -2,6 +2,7 @@ package com.exemplo.paymentservice;
 
 import com.exemplo.paymentservice.domain.NumeroCartao;
 import com.exemplo.paymentservice.domain.Pagamento;
+import com.exemplo.paymentservice.domain.PagamentoConfirmadoEvent;
 import com.exemplo.paymentservice.domain.PagamentoId;
 import com.exemplo.paymentservice.domain.PagamentoRecusadoException;
 import com.exemplo.paymentservice.domain.PedidoId;
@@ -13,6 +14,8 @@ import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 /**
  * Testes do agregado puro, sem Spring — prova que a regra de negócio
@@ -67,5 +70,26 @@ class PagamentoTest {
         pagamento.confirmar();
 
         assertThrows(IllegalStateException.class, pagamento::confirmar);
+    }
+
+    @Test
+    void deveRegistrarEventoDeDominioAoConfirmar() {
+        Pagamento pagamento = Pagamento.criar(
+                PagamentoId.novo(),
+                new PedidoId(1L),
+                new Valor(new BigDecimal("250.00")),
+                new NumeroCartao("4111111111111111")
+        );
+
+        assertTrue(pagamento.getEventos().isEmpty());
+
+        pagamento.confirmar();
+
+        assertEquals(1, pagamento.getEventos().size());
+        assertInstanceOf(PagamentoConfirmadoEvent.class, pagamento.getEventos().get(0));
+
+        PagamentoConfirmadoEvent evento = (PagamentoConfirmadoEvent) pagamento.getEventos().get(0);
+        assertEquals(pagamento.getId(), evento.pagamentoId());
+        assertEquals(pagamento.getPedidoId(), evento.pedidoId());
     }
 }

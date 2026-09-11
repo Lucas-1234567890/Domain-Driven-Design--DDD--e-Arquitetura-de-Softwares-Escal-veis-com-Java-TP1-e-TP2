@@ -1,6 +1,10 @@
 package com.exemplo.paymentservice.domain;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Aggregate Root do contexto de Pagamento.
@@ -22,6 +26,8 @@ public class Pagamento {
     private final Valor valor;
     private final NumeroCartao numeroCartao;
     private StatusPagamento status;
+
+    private final List<DomainEvent> eventos = new ArrayList<>();
 
     private Pagamento(PagamentoId id, PedidoId pedidoId, Valor valor,
                        NumeroCartao numeroCartao, StatusPagamento status) {
@@ -61,8 +67,26 @@ public class Pagamento {
             throw new IllegalStateException("Pagamento já confirmado");
         }
         this.status = StatusPagamento.CONFIRMADO;
-        // Aqui entraria o registro de um evento de domínio: PagamentoConfirmadoEvent,
-        // publicado para o monólito (ex.: via mensageria) atualizar o status do Pedido.
+
+        this.eventos.add(new PagamentoConfirmadoEvent(
+                this.id,
+                this.pedidoId,
+                this.valor.getQuantia(),
+                Instant.now()
+        ));
+    }
+
+    /**
+     * Expõe os eventos acumulados para a camada de aplicação, que é
+     * responsável por publicá-los após o commit da transação e então
+     * limpar a lista (ver PagamentoApplicationService).
+     */
+    public List<DomainEvent> getEventos() {
+        return Collections.unmodifiableList(eventos);
+    }
+
+    public void limparEventos() {
+        this.eventos.clear();
     }
 
     public void estornar() {
