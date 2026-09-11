@@ -172,13 +172,86 @@ git push -u origin main
 ```
 
 ![Repositório no GitHub](docs/screenshots/print8.png)
-*Print 8 — depois do `git push`, abra a página do repositório no GitHub (`github.com/SEU_USUARIO/payment-service`) e capture a listagem de arquivos com o README renderizado embaixo. É o print que fecha a entrega, mostrando que o código está publicado e não só local.*
+*Repositório publicado no GitHub.*
 
-## Próximos passos possíveis (fora do escopo do TP1)
+## TP2 — Eventos de Domínio
 
-- Publicar `PagamentoConfirmadoEvent` em um broker (RabbitMQ/Kafka) em vez de o monólito chamar via HTTP síncrono, reduzindo acoplamento temporal.
-- Trocar o client-generated `UUID` por um Snowflake ID se a ordenação por tempo de criação importar.
-- Adicionar Testcontainers para rodar os testes de integração da camada de persistência contra um Postgres real, já que H2 em memória diverge de produção em alguns detalhes de SQL.
+Como evolução da implementação desenvolvida no TP1, o agregado `Pagamento` foi estendido para trabalhar com **Eventos de Domínio**.
+
+A implementação introduz o evento `PagamentoConfirmadoEvent`, registrado pelo agregado sempre que um pagamento é confirmado. Dessa forma, a ocorrência de uma mudança relevante no domínio é representada por um evento, mantendo essa responsabilidade encapsulada no próprio agregado.
+
+### Novos componentes
+
+* `DomainEvent.java` — interface que define a abstração dos eventos de domínio.
+* `PagamentoConfirmadoEvent.java` — evento gerado quando um pagamento é confirmado.
+* `Pagamento.java` — agregado responsável pelo registro dos eventos gerados durante suas operações.
+* `PagamentoTest.java` — teste que valida o registro do evento após a confirmação do pagamento.
+
+### Prints
+
+| # | Preview                                                 | Descrição                                                                            |
+| - | ------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| 1 | <img src="docs/screenshots/print1tp2.png" width="220"/> | Interface `DomainEvent`, utilizada como abstração para os eventos de domínio         |
+| 2 | <img src="docs/screenshots/print2tp2.png" width="220"/> | Implementação do evento `PagamentoConfirmadoEvent`                                   |
+| 3 | <img src="docs/screenshots/print3tp2.png" width="220"/> | Agregado `Pagamento` registrando o evento durante a execução do método `confirmar()` |
+| 4 | <img src="docs/screenshots/print4tp2.png" width="220"/> | Execução da suíte de testes com a validação do registro do evento de domínio         |
+| 5 | <img src="docs/screenshots/print5tp2.png" width="220"/> | Arquitetura proposta para publicação dos eventos utilizando Outbox e Kafka           |
+
+### 1. Interface de evento de domínio
+
+A interface `DomainEvent` estabelece a abstração utilizada pelos eventos do domínio, permitindo que diferentes eventos possam seguir uma mesma estrutura sem criar dependência com mecanismos externos de infraestrutura.
+
+![Interface DomainEvent](docs/screenshots/print1tp2.png)
+
+*Interface `DomainEvent`, responsável pela abstração dos eventos de domínio.*
+
+### 2. Evento `PagamentoConfirmadoEvent`
+
+Foi implementado o `PagamentoConfirmadoEvent` para representar, de forma explícita, a confirmação de um pagamento dentro do domínio.
+
+O evento contém as informações necessárias para identificar a operação realizada e pode posteriormente ser utilizado pela camada de infraestrutura para publicação ou processamento.
+
+![PagamentoConfirmadoEvent](docs/screenshots/print2tp2.png)
+
+*Implementação do `PagamentoConfirmadoEvent` como representação da confirmação de um pagamento.*
+
+### 3. Registro do evento no agregado
+
+O agregado `Pagamento` passou a manter internamente os eventos gerados durante suas operações.
+
+No método `confirmar()`, após a validação das regras de negócio e alteração do estado do pagamento, o `PagamentoConfirmadoEvent` é adicionado à coleção de eventos do agregado.
+
+![Registro do evento no agregado](docs/screenshots/print3tp2.png)
+
+*Registro do `PagamentoConfirmadoEvent` durante a execução do método `confirmar()`.*
+
+Os eventos podem ser consultados através de `getEventos()` e removidos com `limparEventos()`. Dessa forma, o agregado permanece responsável por registrar os eventos decorrentes das alterações realizadas no domínio.
+
+### 4. Testes
+
+Foi incluído um teste específico para validar o comportamento relacionado aos eventos de domínio.
+
+O teste `deveRegistrarEventoDeDominioAoConfirmar()` verifica se, após a confirmação de um pagamento, o evento `PagamentoConfirmadoEvent` é corretamente registrado pelo agregado.
+
+A suíte pode ser executada através do Maven:
+
+```bash
+mvn test
+```
+
+![Testes do TP2](docs/screenshots/print4tp2.png)
+
+*Execução da suíte de testes com sucesso, incluindo o teste de registro do evento de domínio.*
+
+### 5. Arquitetura de publicação dos eventos
+
+A implementação dos eventos de domínio possibilita sua integração posterior com mecanismos de mensageria.
+
+A arquitetura representada utiliza o padrão **Outbox** para garantir a persistência dos eventos e o **Apache Kafka** para sua distribuição aos demais componentes interessados.
+
+![Arquitetura de publicação dos eventos](docs/screenshots/print5tp2.png)
+
+*Arquitetura proposta para persistência e publicação dos eventos de domínio utilizando Outbox e Kafka.*
 
 ---
 
