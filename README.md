@@ -172,30 +172,13 @@ git push -u origin main
 ```
 
 ![Repositório no GitHub](docs/screenshots/print8.png)
-*Repositório publicado no GitHub.*
+*Print 8 — depois do `git push`, abra a página do repositório no GitHub (`github.com/SEU_USUARIO/payment-service`) e capture a listagem de arquivos com o README renderizado embaixo. É o print que fecha a entrega, mostrando que o código está publicado e não só local.*
 
-## TP2 — Eventos de Domínio
+## Próximos passos possíveis (fora do escopo do TP1)
 
-Extensão do agregado `Pagamento` para registrar um evento de domínio (`PagamentoConfirmadoEvent`) sempre que `confirmar()` é chamado, seguindo a mesma lógica de "nada sai do agregado sem passar pela regra de negócio" já usada nas invariantes do TP1.
-
-### Novos arquivos
-
-- `domain/DomainEvent.java` — abstração (interface) de evento de domínio.
-- `domain/PagamentoConfirmadoEvent.java` — implementação concreta, com os dados do pagamento confirmado.
-- `domain/Pagamento.java` — método `confirmar()` agora registra o evento em uma lista interna, exposta via `getEventos()` / limpa via `limparEventos()`.
-- `src/test/.../PagamentoTest.java` — novo teste `deveRegistrarEventoDeDominioAoConfirmar()`.
-
-### Prints a capturar para a entrega do TP2
-
-| # | O que printar | Nome do arquivo |
-| --- | --- | --- |
-| 1 | `DomainEvent.java` aberto no VSCode (a interface) | `print1tp2.png` |
-| 2 | `PagamentoConfirmadoEvent.java` aberto no VSCode (o record) | `print2tp2.png` |
-| 3 | `Pagamento.java` com o método `confirmar()` visível, mostrando `this.eventos.add(...)` | `print3tp2.png` |
-| 4 | Terminal rodando `mvn test` com todos os testes passando, incluindo `deveRegistrarEventoDeDominioAoConfirmar` | `print4tp2.png` |
-| 5 | (Opcional) Diagrama de arquitetura de publicação dos eventos (Outbox + Kafka), entregue junto ao PDF do TP2 | `print5tp2.png` |
-
-Salve os prints em `docs/screenshots/` com esses nomes e referencie-os aqui do mesmo jeito que os `print1.png`...`print8.png` do TP1, antes de subir o commit final.
+- Publicar `PagamentoConfirmadoEvent` em um broker (RabbitMQ/Kafka) em vez de o monólito chamar via HTTP síncrono, reduzindo acoplamento temporal.
+- Trocar o client-generated `UUID` por um Snowflake ID se a ordenação por tempo de criação importar.
+- Adicionar Testcontainers para rodar os testes de integração da camada de persistência contra um Postgres real, já que H2 em memória diverge de produção em alguns detalhes de SQL.
 
 ---
 
