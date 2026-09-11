@@ -6,17 +6,15 @@ Este projeto é o material de apoio da Questão 14 do TP1 (DDD e Arquitetura de 
 
 ## Prints
 
-Salve cada captura em `docs/screenshots/` com o nome exato abaixo — as imagens já estão referenciadas no README. Enquanto os arquivos não existirem, o GitHub mostra o ícone de imagem quebrada nesses pontos; é normal até você adicionar os prints.
-
-| # | Preview | O que mostra |
+| # | Preview | Descrição |
 |---|---|---|
-| 1 | <img src="docs/screenshots/print1.png" width="220"/> | Estrutura de pastas do projeto aberta no VSCode |
-| 2 | <img src="docs/screenshots/print2.png" width="220"/> | `mvn spring-boot:run` com a aplicação no ar |
-| 3 | <img src="docs/screenshots/print3.png" width="220"/> | Pagamento aprovado (201 Created) |
-| 4 | <img src="docs/screenshots/print4.png" width="220"/> | Pagamento recusado — valor acima do limite (422) |
-| 5 | <img src="docs/screenshots/print5.png" width="220"/> | Pagamento recusado — cartão bloqueado (422) |
-| 6 | <img src="docs/screenshots/print6.png" width="220"/> | `mvn test` com os 4 testes do agregado passando |
-| 7 | <img src="docs/screenshots/print7.png" width="220"/> | Console H2 com a tabela `pagamentos` populada |
+| 1 | <img src="docs/screenshots/print1.png" width="220"/> | Estrutura em camadas do projeto no VSCode (`domain`, `application`, `config`, `infrastructure`) |
+| 2 | <img src="docs/screenshots/print2.png" width="220"/> | Aplicação iniciada com sucesso via `mvn spring-boot:run` |
+| 3 | <img src="docs/screenshots/print3.png" width="220"/> | Pagamento aprovado — `201 Created`, status `CONFIRMADO` |
+| 4 | <img src="docs/screenshots/print4.png" width="220"/> | Pagamento recusado por limite de valor — `422 Unprocessable Entity` |
+| 5 | <img src="docs/screenshots/print5.png" width="220"/> | Pagamento recusado por cartão bloqueado — `422 Unprocessable Entity` |
+| 6 | <img src="docs/screenshots/print6.png" width="220"/> | Suíte de testes do agregado executada via `mvn test` |
+| 7 | <img src="docs/screenshots/print7.png" width="220"/> | Console H2 exibindo os registros persistidos na tabela `pagamentos` |
 | 8 | <img src="docs/screenshots/print8.png" width="220"/> | Repositório publicado no GitHub |
 
 
@@ -61,7 +59,7 @@ docs/exemplo-monolito/              # NÃO compila aqui — cole no repositório
 O domínio (`domain/`) não importa nada de Spring nem de JPA — ele é testável isoladamente (ver `src/test`).
 
 ![Estrutura do projeto no VSCode](docs/screenshots/print1.png)
-*Print 1 — no VSCode, com a pasta do projeto aberta, expanda `src/main/java/com/exemplo/paymentservice` até aparecerem as pastas `domain`, `application`, `config` e `infrastructure` na árvore lateral (Explorer). Essa é a foto que mostra a separação em camadas do DDD de forma visual — vale mais que qualquer parágrafo explicando.*
+*Estrutura em camadas do domínio, isolando `domain`, `application`, `config` e `infrastructure`.*
 
 ## Como rodar
 
@@ -88,7 +86,7 @@ Password: (em branco)
 ```
 
 ![Aplicação rodando](docs/screenshots/print2.png)
-*Print 2 — depois de rodar `mvn spring-boot:run` no terminal integrado do VSCode, espere o log terminar e tire o print mostrando as últimas linhas, principalmente `Tomcat started on port 8081` e `Started PaymentServiceApplication in X seconds`. Deixe o terminal com fundo escuro visível — é a prova de que a aplicação subiu sem erro.*
+*Aplicação iniciada com sucesso na porta 8081.*
 
 ## Testando
 
@@ -105,9 +103,9 @@ curl -X POST http://localhost:8081/pagamentos \
 ```
 
 ![Pagamento aprovado](docs/screenshots/print3.png)
-*Print 3 — envie o primeiro bloco do `requests.http` (pedido 1, valor 250, cartão terminado em 1111). Capture a resposta inteira: o status HTTP `201 Created` no topo do painel do REST Client e o corpo JSON com `"status": "CONFIRMADO"`.*
+*Requisição de pagamento aprovada, com o agregado retornando status `CONFIRMADO`.*
 
-Agora os dois cenários de recusa — a parte que prova que a regra de negócio está no agregado, não decorada:
+Cenários de recusa, evidenciando as invariantes de negócio encapsuladas no agregado:
 
 ```bash
 curl -X POST http://localhost:8081/pagamentos \
@@ -116,7 +114,7 @@ curl -X POST http://localhost:8081/pagamentos \
 ```
 
 ![Pagamento recusado por limite](docs/screenshots/print4.png)
-*Print 4 — envie o segundo bloco do `requests.http` (valor 15000). Capture o `422 Unprocessable Entity` com a mensagem `"erro": "Valor acima do limite permitido (R$ 10.000,00)"`.*
+*Requisição recusada por exceder o limite de R$ 10.000,00.*
 
 ```bash
 curl -X POST http://localhost:8081/pagamentos \
@@ -125,16 +123,16 @@ curl -X POST http://localhost:8081/pagamentos \
 ```
 
 ![Pagamento recusado por cartão bloqueado](docs/screenshots/print5.png)
-*Print 5 — envie o terceiro bloco (cartão terminado em 0000). Capture o `422` com `"erro": "Cartão bloqueado"`.*
+*Requisição recusada por cartão bloqueado.*
 
-Também dá pra rodar os testes unitários do agregado (sem precisar da aplicação no ar):
+Suíte de testes do agregado, executável de forma isolada, sem dependência de HTTP ou banco:
 
 ```bash
 mvn test
 ```
 
 ![Testes passando](docs/screenshots/print6.png)
-*Print 6 — rode `mvn test` num terminal separado (pode ser com a aplicação parada). Capture o resumo final do Maven: `Tests run: 4, Failures: 0, Errors: 0` e o `BUILD SUCCESS`. Essa é a prova de que a regra de negócio funciona isolada, sem precisar de HTTP nem banco no ar.*
+*Suíte de testes do agregado `Pagamento` executada com sucesso.*
 
 ## Regras de negócio (equivalentes às do monólito legado)
 
@@ -146,7 +144,7 @@ mvn test
 A diferença para o monólito é **onde** essas regras vivem: aqui elas estão dentro do Aggregate Root `Pagamento`, não espalhadas por um service — é impossível existir um `Pagamento` em memória que viole essas invariantes.
 
 ![Console H2 com dados persistidos](docs/screenshots/print7.png)
-*Print 7 — com a aplicação no ar, abra `http://localhost:8081/h2-console` no navegador, cole a JDBC URL `jdbc:h2:mem:payment`, clique em Connect, e depois rode `SELECT * FROM PAGAMENTOS;` na tela de query. Capture a tabela com pelo menos os 2 registros que foram aprovados (os recusados nunca chegam a ser persistidos — ótimo detalhe pra comentar no seu TP).*
+*Registros persistidos na tabela `pagamentos`. Requisições recusadas não geram persistência, já que a validação ocorre antes de qualquer chamada ao repositório.*
 
 ## Integração com o monólito (Strangler Fig / Branch by Abstraction)
 
@@ -174,13 +172,8 @@ git push -u origin main
 ```
 
 ![Repositório no GitHub](docs/screenshots/print8.png)
-*Print 8 — depois do `git push`, abra a página do repositório no GitHub (`github.com/SEU_USUARIO/payment-service`) e capture a listagem de arquivos com o README renderizado embaixo. É o print que fecha a entrega, mostrando que o código está publicado e não só local.*
+*Repositório publicado no GitHub.*
 
-## Próximos passos possíveis (fora do escopo do TP1)
-
-- Publicar `PagamentoConfirmadoEvent` em um broker (RabbitMQ/Kafka) em vez de o monólito chamar via HTTP síncrono, reduzindo acoplamento temporal.
-- Trocar o client-generated `UUID` por um Snowflake ID se a ordenação por tempo de criação importar.
-- Adicionar Testcontainers para rodar os testes de integração da camada de persistência contra um Postgres real, já que H2 em memória diverge de produção em alguns detalhes de SQL.
 
 ---
 
